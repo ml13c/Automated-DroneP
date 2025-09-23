@@ -12,7 +12,7 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
 mp_draw = mp.solutions.drawing_utils
 
-# Webcam
+# webcam(desktop)/ pi ai camera
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)  # width
 cap.set(4, 480)  # height
