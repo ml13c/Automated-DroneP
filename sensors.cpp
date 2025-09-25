@@ -1,18 +1,15 @@
 // microcontroller (to be altered)
 #include <iostream>
-
-//  Define the pin connected to the ultrasonic sensor's interrupt output
 #define SENSOR_PIN 2
 #define DANGER_ZONE_meters 1 // Example threshold distance in m
-// Declare a global variable to store the obstacle status
 bool obstacleDetected = false;
 int lastDistance = -1;
 
 int readLidarDistance(){
     int distance = 5; // whatever is read from sensor
     // Placeholder function to simulate reading distance from a LIDAR sensor
-    // In a real implementation, this would interface with the LIDAR hardware
-    return distance; // Replace with actual distance reading logic
+    // lidar hardware interaction code would go here
+    return distance; // replace-distance reading logic
 }
 
 // SEPERATE FROM 360 CAMERA TO DETECT GESTURES
