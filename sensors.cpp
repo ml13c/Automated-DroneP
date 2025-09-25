@@ -4,17 +4,31 @@
 #define DANGER_ZONE_meters 1 // Example threshold distance in m
 bool obstacleDetected = false;
 int lastDistance = -1;
+const char* PI_IP = "pi ip";//shouldnt change after configured
+const int PI_PORT = 5005;
+/*
+this is intended for the flight controller so not final code just a draft
+the flight controller will have a lidar and a 360 camera to detect obstacles
+if the lidar detects something within a danger zone it will trigger a 'reverse'
+same with the camera if it detects something like netting(main use)
 
-int readLidarDistance(){
+*/
+int readLidarDistance(){//maybe double or cm idk
     int distance = 5; // whatever is read from sensor
-    // Placeholder function to simulate reading distance from a LIDAR sensor
-    // lidar hardware interaction code would go here
-    return distance; // replace-distance reading logic
+    // lidar reading logic here
+    return distance; // replace with distance reading logic
 }
 
 // SEPERATE FROM 360 CAMERA TO DETECT GESTURES
-void readCameraObstacles(){// this is mainly for obstacles like nets that the lidar cant see
+bool readCameraObstacles(){// this is mainly for obstacles like nets that the lidar cant see
     // return true or false if obstacle matches thing like netting
+    /*
+    if obstacle matches netting photos/characteristics/data{
+        return true;
+    }
+        data used for training should be nets from different distances, weather, lighting, angles
+    */
+    return false; // placeholder
 }
 volatile bool checkObstacles(){
     int distance = readLidarDistance();
@@ -36,44 +50,13 @@ void obstacle_handler() {//maybe add parameter in future cause its better for te
     }
 }
 
-void obstacle_reverse_drone(){
-    // Logic to reverse or avoid the obstacle
-    std::cout << "Reversing to avoid obstacle." << std::endl;
-    // This is a placeholder function. In a real implementation, this would control the drone's motors.
-}
-// void setup() {
-//     // Set the sensor pin as an input
-//     pinMode(SENSOR_PIN, INPUT);
-
-//     // Attach the interrupt to the sensor pin
-//     // CHANGE means the interrupt triggers on both rising and falling edges of the signal
-//     attachInterrupt(digitalPinToInterrupt(SENSOR_PIN), obstacle_handler, CHANGE);
-
-//     // Start the motors and begin the flight loop
-//     start_motors();
-// }
-
-void loop() {
-    // Main flight loop
-    // This is the primary, continuous task of the microcontroller
-
-    if (obstacleDetected) {
-        // Stop the motors or execute an avoidance maneuver
-        // For a real drone, this would call a more complex function
-        stop_motors();
-        // Reset the flag so it only runs once per detection
-        obstacleDetected = false;
-    }
-
-    // Continue with regular flight calculations
-    fly_straight();
-}
+// main flight loop (placeholder)
 int main(){
     while(true){
         //setup stuff?
-        
-        if(obstacleDetected()){
-            obstacle_handler(obstacleDetected());
+        if(checkObstacles()){
+            obstacle_handler();
         }
+        loop();//main flight loop
     }
 }

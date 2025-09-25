@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
 import socket
+# this is to detect hand gestures through media pipe
+# later will use optimized model on pi camera but for now testing w stock
 
 PI_IP = "192.168.50.8"  # Replace with your Pi's IP
 PI_PORT = 5005

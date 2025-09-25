@@ -4,6 +4,15 @@ import detect_movement
 import RPi.GPIO as GPIO
 import time
 from threading import Thread
+import sensors
+# bridge for ai and flight controller
+# 
+#
+#
+# gesture INTERRUPTS override modes if user wants to change commands
+#
+#
+#
 
 # This function runs when a gesture interrupt is detected
 def command_handler(channel):
@@ -32,7 +41,7 @@ GPIO.setup(GESTURE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(GESTURE_PIN, GPIO.FALLING, callback=command_handler, bouncetime=200)
 
 # Run the main flight loop in a separate thread so it doesn't block
-flight_thread = Thread(target=main_flight_loop)
+flight_thread = Thread(target=flightmode_follow_user)
 flight_thread.start()
 
 # Keep the main program running to listen for interrupts
