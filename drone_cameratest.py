@@ -8,10 +8,10 @@ import sensors
 # bridge for ai and flight controller
 # 
 #
-#
+# 
 # gesture INTERRUPTS override modes if user wants to change commands
-#
-#
+# second thread is in charge of user tracking with camera #2 AI camera(180/-180)
+# 
 #
 
 # This function runs when a gesture interrupt is detected
