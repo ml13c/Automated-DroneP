@@ -23,8 +23,17 @@ center_tolerance = 50  # pixels for dead zone
 
 last_command = "stop"
 
-print("Starting hand tracking...")
 
+# camera should always be on looking for user (specifically user hand) and trying to detect gestures
+
+print("Starting hand tracking...")
+# for quick reference(inclusive):
+# 1,5,9,13,17 = joint knuckles parts of fingers
+# thumb = 1-4
+# index = 5-8
+# middle = 9-12
+# ring = 13-16
+# pinky = 17-20
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -33,32 +42,53 @@ while True:
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(rgb)
 
-    command = "stop"
-
+    command = "stop"  # default command
+    
+    
     if results.multi_hand_landmarks:
         hand_landmarks = results.multi_hand_landmarks[0]
-        h, w, _ = frame.shape
-        cx = int(hand_landmarks.landmark[0].x * w)  # palm center
+        landmarks = hand_landmarks.landmark
+    
+    
+    
+    
+        
+        if landmarks[1:4]:#thumb
+            print("thumb only means land")
+        if landmarks[5:20]:# 4 fingers no thumb
+            print("4 fingers detected")
+        if landmarks[5:16]:# 3 fingers no thumb, no pinky
+            print("3 fingers detected")
+        if landmarks[5:12]:# 2 middle and index fingers
+            print("2 fingers detected")
+        if landmarks[5:8]:# 1 index finger
+            print("1 finger detected. controlling drone now")
+        # control using hand movement for navigating drone(1 index finger triggers this)
+            if results.multi_hand_landmarks:
+                hand_landmarks = results.multi_hand_landmarks[0]
+                h, w, _ = frame.shape
+                cx = int(hand_landmarks.landmark[0].x * w)  # palm center
 
-        # Dead zone
-        if cx < frame_center_x - center_tolerance:
-            command = "left"
-        elif cx > frame_center_x + center_tolerance:
-            command = "right"
-        else:
-            command = "stop"
+                # Dead zone
+                if cx < frame_center_x - center_tolerance:
+                    command = "left"
+                elif cx > frame_center_x + center_tolerance:
+                    command = "right"
+                else:
+                    command = "stop"
 
-        mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+                mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-    # Only send if command changed
-    if command != last_command:
-        sock.sendto(command.encode(), (PI_IP, PI_PORT))
-        print(f"Sending command: {command}")
-        last_command = command
+        # IMPORTANT: only sends to pi if command changes. stops flooding
+        # and will be used later on in project for handling other sensors.
+        if command != last_command:
+            sock.sendto(command.encode(), (PI_IP, PI_PORT))
+            print(f"Sending command: {command}")
+            last_command = command
 
-    cv2.imshow("Hand Tracking", frame)
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+        cv2.imshow("Hand gesture test 2", frame)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
 cap.release()
 cv2.destroyAllWindows()
