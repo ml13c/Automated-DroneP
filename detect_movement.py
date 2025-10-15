@@ -89,12 +89,14 @@ while True:
             gesture = "4_fingers"
             if gesture != last_gesture:
                 print("4 fingers detected")
+                print("")
                 last_gesture = gesture
 
         elif (index_up and middle_up and ring_up) and not (thumb_up or pinky_up):  # 3 fingers
             gesture = "3_fingers"
             if gesture != last_gesture:
                 print("3 fingers detected")
+                print("")
                 last_gesture = gesture
 
         elif (index_up and middle_up) and not (thumb_up or ring_up or pinky_up):  # 2 fingers
@@ -122,6 +124,7 @@ while True:
 
         else:
             gesture = "none"
+            print("no gesture detected")
 
         # only send command if changed
         if command != last_command:
