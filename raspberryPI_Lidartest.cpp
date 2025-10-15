@@ -19,7 +19,7 @@ void handle_sigint(int)
     keepRunning = false;
 }
 
-//LIDARLite_v3 myLidarLite;
+//  LIDARLite_v3 myLidarLite;
 
 int main()
 {

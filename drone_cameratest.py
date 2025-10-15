@@ -1,6 +1,6 @@
 gestures:
 # Pseudocode for a Raspberry Pi (e.g., Python)
-import detect_movement
+import detect_handgestures
 import RPi.GPIO as GPIO
 import time
 from threading import Thread
