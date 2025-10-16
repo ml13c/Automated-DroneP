@@ -164,3 +164,28 @@ while True:                                             #always looking for user
             #command = 1
             print("Gesture: 1 - control mode(should be locked in this mode until otherwise specified)")
             last_gesture = gesture
+            
+            height, width, _ = frame.shape
+            cx = int(hand_landmarks.lanmark[0].x * width)#center of palm
+            if cx < frame_center_x - center_tolerance:
+                command = "left"
+            elif cx > frame_center_x + center_tolerance:
+                command = "right"
+            else:
+                print("command set as hover(not 5)")
+                command = "hover"#5
+        else:
+            gesture = None
+            print("No valid gesture detected")
+        if command != last_command:
+            #sock.sendto(command.encode(), (UDP_IP, UDP_PORT))
+            print(f"Command: {command}")
+            last_command = command
+            
+        mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+        
+    cv2.imshow("Drone Camera POV Test", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+cap.release()
+cv2.destroyAllWindows()
