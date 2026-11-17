@@ -1,0 +1,53 @@
+[
+  {
+    "model": "FP32 (best.pt)",
+    "dtype": "FP32",
+    "calibration_images": null,
+    "split": "test",
+    "mAP50": 0.6371,
+    "mAP50_95": 0.4859,
+    "precision": 0.722,
+    "recall": 0.6435,
+    "per_class_mAP50": {
+      "hand": 0.9939,
+      "ball": 0.2804
+    },
+    "eval_time_s": 66.4,
+    "imx_memory": {}
+  },
+  {
+    "model": "INT8 IMX, 314 cal. images",
+    "dtype": "INT8",
+    "calibration_images": 314,
+    "split": "test",
+    "mAP50": 0.5548,
+    "mAP50_95": 0.4412,
+    "precision": 0.7921,
+    "recall": 0.5656,
+    "per_class_mAP50": {
+      "hand": 0.9822,
+      "ball": 0.1274
+    },
+    "eval_time_s": 2100.9,
+    "imx_memory": {
+      "Name": "model_imx",
+      "Runtime Memory Physical Size": "1.19MB",
+      "Model Memory Physical Size": "2.58MB",
+      "Reserved Memory": "1.00KB",
+      "Memory Usage": "3.76MB",
+      "Total Memory Available On Chip": "8.00MB",
+      "Memory Utilization": "48%",
+      "Fit In Chip": true,
+      "Input Persistent": false,
+      "Networks": [
+        {
+          "Hash": "model_imx",
+          "Name": "model_imx",
+          "Runtime Memory Physical Size": "1.19MB",
+          "Model Memory Physical Size": "2.58MB",
+          "Input Persistence Cost": "0B"
+        }
+      ]
+    }
+  }
+]

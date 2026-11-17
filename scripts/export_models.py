@@ -16,34 +16,35 @@ import argparse
 import json
 import platform
 import shutil
-import sys
 import time
 from pathlib import Path
 
 import yaml
 
-from dronevision.config import REPO_ROOT, load_config
+from dronevision.config import REPO_ROOT, load_config, platform_dataset_yaml
+from dronevision.datasets import IMAGE_EXTS
 
 
-def local_dataset_yaml(cfg: dict) -> Path:
-    """dataset.yaml stores an absolute path from the OS that built it (e.g. C:\\...), which
-    WSL can't read. Write a copy pointing at this checkout's data/detector for this OS."""
-    src = REPO_ROOT / cfg["dataset"]
-    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
-    doc["path"] = str(src.parent.resolve())
-    dst = src.with_name(f"dataset_{sys.platform}.yaml")
-    dst.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
-    return dst
+def calibration_count(data_yaml: Path, fraction: float) -> int:
+    """Images Ultralytics uses for INT8 calibration: `fraction` of the VAL split."""
+    doc = yaml.safe_load(data_yaml.read_text(encoding="utf-8"))
+    val = Path(doc["path"]) / doc["val"]
+    return int(sum(1 for p in val.iterdir() if p.suffix.lower() in IMAGE_EXTS) * fraction)
 
 
-def export_imx(model, weights: Path, cfg: dict) -> dict:
+def export_imx(model, weights: Path, cfg: dict, fraction: float | None) -> dict:
     ex = cfg["export"]["imx"]
-    data = local_dataset_yaml(cfg)
+    fraction = ex["fraction"] if fraction is None else fraction
+    data = platform_dataset_yaml(cfg["dataset"])
+    n_cal = calibration_count(data, fraction)
     t0 = time.time()
-    out = Path(
-        model.export(format="imx", data=str(data), imgsz=ex["imgsz"], fraction=ex["fraction"])
-    )
+    out = Path(model.export(format="imx", data=str(data), imgsz=ex["imgsz"], fraction=fraction))
     out_dir = out if out.is_dir() else out.parent
+    # Keep one folder per calibration size; Ultralytics needs the `_imx_model` suffix.
+    tagged = out_dir.with_name(f"{weights.stem}_cal{n_cal}_imx_model")
+    if tagged.exists():
+        shutil.rmtree(tagged)
+    out_dir = out_dir.rename(tagged)
     files = {
         p.name: round(p.stat().st_size / 2**20, 3) for p in sorted(out_dir.iterdir()) if p.is_file()
     }
@@ -51,6 +52,8 @@ def export_imx(model, weights: Path, cfg: dict) -> dict:
     memory = json.loads(reports[0].read_text(encoding="utf-8")) if reports else None
     return {
         "output_dir": str(out_dir),
+        "calibration_images": n_cal,
+        "calibration_fraction_of_val": fraction,
         "export_time_s": round(time.time() - t0, 1),
         "files_mib": files,
         "memory_report_file": reports[0].name if reports else None,
@@ -64,6 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--weights", type=Path, required=True)
     p.add_argument("--format", choices=["imx", "onnx"], required=True)
     p.add_argument("--config", default="detector")
+    p.add_argument("--fraction", type=float, help="IMX calibration share of val (overrides config)")
     args = p.parse_args(argv)
 
     from ultralytics import YOLO
@@ -77,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.format == "imx":
         if platform.system() != "Linux":
             raise SystemExit("IMX export is Linux-only: run this inside WSL2.")
-        info = export_imx(model, weights, cfg)
+        info = export_imx(model, weights, cfg, args.fraction)
     else:
         out = Path(model.export(format="onnx", imgsz=cfg["train"]["imgsz"], dynamic=False))
         info = {"output": str(out), "size_mib": round(out.stat().st_size / 2**20, 3)}
@@ -92,10 +96,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     res = REPO_ROOT / "results" / "detector" / run
     res.mkdir(parents=True, exist_ok=True)
+    tag = f"_cal{info['calibration_images']}" if args.format == "imx" else ""
     report_path = info.pop("_report_path", None)
     if report_path:
-        shutil.copy2(report_path, res / Path(report_path).name)
-    (res / f"{args.format}_export.json").write_text(json.dumps(info, indent=2), encoding="utf-8")
+        shutil.copy2(report_path, res / f"{Path(report_path).stem}{tag}.json")
+    out_json = res / f"{args.format}_export{tag}.json"
+    out_json.write_text(json.dumps(info, indent=2), encoding="utf-8")
     print(json.dumps(info, indent=2))
     return 0
 

@@ -30,3 +30,19 @@ def test_draw_stats_draws_in_place():
 def test_draw_stats_tolerates_tiny_image():
     img = np.zeros((5, 5, 3), dtype=np.uint8)
     draw_stats(img, {"a very long key": "a very long value"})
+
+
+def test_platform_dataset_yaml_rewrites_path(tmp_path):
+    import sys
+
+    import yaml
+
+    from dronevision.config import platform_dataset_yaml
+
+    src = tmp_path / "dataset.yaml"
+    src.write_text("path: /built/on/another/os\ntrain: images/train\nnames: {0: hand}\n")
+    out = platform_dataset_yaml(src)
+    assert out.name == f"dataset_{sys.platform}.yaml"
+    doc = yaml.safe_load(out.read_text())
+    assert doc["path"] == str(tmp_path.resolve())
+    assert doc["train"] == "images/train" and doc["names"] == {0: "hand"}
