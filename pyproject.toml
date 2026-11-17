@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dronevision"
+version = "0.0.1"
+description = "Gesture-controlled drone 'brain' (detection, tracking, mode logic) prototyped on a laptop webcam."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "opencv-python>=4.9",
+    "PyYAML>=6.0",
+    "psutil>=5.9",
+]
+
+[project.optional-dependencies]
+# Pick ONE of cpu / gpu: both packages install the same `onnxruntime` module.
+cpu = ["onnxruntime>=1.18"]
+gpu = ["onnxruntime-gpu>=1.20", "nvidia-ml-py>=12.0"]
+# PyTorch is NOT listed here on purpose: pip would pull the CPU-only wheel on Windows.
+# Install the CUDA build first (see README), then this extra.
+train = ["ultralytics>=8.3", "onnx>=1.16"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["legacy"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

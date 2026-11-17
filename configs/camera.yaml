@@ -1,0 +1,12 @@
+# Camera source settings used by scripts/run_demo.py (and later every pipeline script).
+# Requested values: the camera may not honour them; run_demo prints what it actually got.
+
+source: "0"          # webcam index ("0", "1", ...) or a path to a video file
+width: 640
+height: 480
+fps: 30
+backend: auto        # auto | dshow | msmf | v4l2  (dshow usually opens faster on Windows)
+mirror: true         # flip horizontally for display (selfie view); webcam only
+
+hud:
+  fps_window_frames: 30   # FPS = frames / elapsed time over this many recent frames

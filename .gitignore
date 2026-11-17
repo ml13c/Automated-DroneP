@@ -1,0 +1,64 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+.python-version
+
+# ---- Tooling caches ----
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- Datasets (built/downloaded by scripts, never committed) ----
+data/
+datasets/
+*.zip
+*.tar
+*.tar.gz
+
+# ---- Model weights & exports (publish final ones as a GitHub Release asset) ----
+weights/
+models/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.engine
+*.tflite
+*.rpk
+*_imx_model/
+*_openvino_model/
+
+# ---- Training / experiment output ----
+runs/
+wandb/
+mlruns/
+lightning_logs/
+
+# ---- Raw recordings & logs (only small curated outputs in results/ are committed) ----
+recordings/
+logs/
+results/raw/
+*.mp4
+*.avi
+*.mov
+*.mkv
+# HWiNFO / power logs (results/*.csv stay committed)
+hwinfo*.csv
+power_logs/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
