@@ -1,0 +1,25 @@
+# YOLO11n hand/ball detector: training + export settings (scripts/train_detector.py,
+# scripts/export_models.py). Run 1 is a BASELINE: Ultralytics default augmentation, no tuning.
+
+dataset: data/detector/dataset.yaml   # written by scripts/build_dataset.py
+model: yolo11n.pt                     # COCO-pretrained weights (Ultralytics auto-download)
+project: runs/detector                # gitignored; small curated outputs are copied to results/
+
+train:
+  imgsz: 320
+  epochs: 50
+  patience: 15                        # early stop if val fitness stalls this many epochs
+  batch: 64
+  workers: 8
+  cache: ram                          # ~4 GB at imgsz 320; speed only, no effect on the model
+  device: 0
+  seed: 0
+  deterministic: true
+  plots: true
+  # Augmentation: Ultralytics defaults for run 1 (mosaic, scale 0.5, hsv, fliplr).
+  # Blur / small-object / brightness tuning comes AFTER the IMX500 export check (PLAN.md M2).
+
+export:
+  imx:
+    imgsz: 320
+    fraction: 0.05                    # share of train images used for INT8 calibration

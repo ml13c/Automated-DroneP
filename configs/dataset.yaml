@@ -1,0 +1,82 @@
+# Dataset build settings for scripts/build_dataset.py (M1).
+# Sizes are per split; `--scale 0.05` on the CLI shrinks everything for a quick smoke run.
+
+root: data                      # all outputs (gitignored)
+seed: 0
+download_workers: 16
+
+detector:
+  classes: [hand, ball]         # YOLO class ids follow this order
+  min_box_px: 4                 # drop boxes smaller than this (either side) after resize
+
+hagrid:
+  # HaGRIDv2, 512 px short side (128 GB zip). Only the sampled images are fetched with HTTP
+  # range requests; the full archive is never downloaded.
+  images_zip: https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/hagrid_v2/hagridv2_512.zip
+  images_prefix: HaGRIDv2_dataset_512
+  annotations_zip: https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/hagrid_v2/annotations_with_landmarks/annotations.zip
+  annotations_prefix: annotations
+  license: "HaGRIDv2, variant of CC BY-SA 4.0 (see github.com/hukenovs/hagrid/tree/master/license)"
+
+  # Images per HaGRID gesture folder for the detector (every hand box -> class `hand`).
+  detector_per_gesture: {train: 300, val: 50, test: 50}
+
+  # Finger classifier: gesture label -> class. Unlisted gestures are excluded.
+  # Contact-sheet check (2026-11-16): `point`, `three_gun`, `thumb_index*` aim at the camera or
+  # sideways; `little_finger`/`middle_finger`/`*_inverted` would blur the count classes.
+  finger_map:
+    fist: "0"
+    one: "1"
+    peace: "2"
+    two_up: "2"
+    three: "3"
+    three2: "3"
+    three3: "3"
+    four: "4"
+    palm: "5"
+    stop: "5"
+    no_gesture: none
+    call: none
+    dislike: none
+    like: none
+    ok: none
+    rock: none
+    mute: none
+    xsign: none
+    timeout: none
+    hand_heart: none
+    hand_heart2: none
+    holy: none
+    grabbing: none
+    grip: none
+    take_picture: none
+  # Crops per finger class, split evenly over that class's source gestures.
+  fingers_per_class: {train: 2000, val: 300, test: 300}
+
+fingers:
+  classes: ["0", "1", "2", "3", "4", "5", none]
+  crop_size: 160                # saved crop side (px); training resizes to 96-128
+  crop_pad: 0.25                # enlarge the square hand box by this fraction per side
+  min_hand_px: 24               # skip hands smaller than this in the source image
+
+coco_ball:
+  # COCO 2017 "sports ball" (category 37). Annotations CC BY 4.0; images under Flickr terms.
+  annotations_zip: http://images.cocodataset.org/annotations/annotations_trainval2017.zip
+  category_id: 37
+  # COCO hands are NOT labelled, so images with big people teach "hand = background".
+  # Keep images whose largest person box covers at most this fraction of the image.
+  max_person_area_frac: 0.15
+  val_fraction: 0.1             # train2017 -> our train/val; val2017 -> our test
+  max_images: {train: 3000, val: 300, test: 300}
+
+summary_warn:
+  # build_dataset.py summary flags classes below these counts (judgement calls, not standards:
+  # roughly where per-class metrics on that split stop being stable).
+  detector_boxes: {train: 1000, val: 150, test: 150, test_own: 100}
+  finger_crops: {train: 1000, val: 150, test: 150, test_own: 30}
+
+own:
+  # Your own clips (scripts/record_clips.py) labelled in CVAT/Roboflow, exported as YOLO.
+  # Used ONLY as the held-out test set ("test_own"): this is the honest benchmark.
+  labeled_dir: data/own/labeled
+  recordings_dir: recordings
