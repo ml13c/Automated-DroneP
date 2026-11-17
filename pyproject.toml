@@ -23,6 +23,9 @@ gpu = ["onnxruntime-gpu>=1.20", "nvidia-ml-py>=12.0"]
 # Install the CUDA build first (see README), then this extra.
 train = ["ultralytics>=8.3", "onnx>=1.16"]
 dev = ["pytest>=8.0", "ruff>=0.6"]
+# IMX500 export (Linux/WSL only). Ultralytics installs the Sony toolchain itself at export
+# time; model-compression-toolkit 2.5.1 breaks with PuLP 4.x (new API, no `lowBound` kwarg).
+imx = ["pulp<4"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

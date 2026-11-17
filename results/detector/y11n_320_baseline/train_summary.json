@@ -1,0 +1,49 @@
+{
+  "run": "y11n_320_baseline",
+  "model": "yolo11n.pt",
+  "train_args": {
+    "imgsz": 320,
+    "epochs": 50,
+    "patience": 15,
+    "batch": 64,
+    "workers": 8,
+    "cache": "ram",
+    "device": 0,
+    "seed": 0,
+    "deterministic": true,
+    "plots": true
+  },
+  "epochs_completed": 50,
+  "wall_time_min": 22.8,
+  "peak_vram_reserved_gib": 2.73,
+  "best_pt_mb": 5.21,
+  "metrics": {
+    "val": {
+      "mAP50": 0.6617,
+      "mAP50_95": 0.482,
+      "precision": 0.7741,
+      "recall": 0.6479,
+      "per_class_mAP50": {
+        "hand": 0.9935,
+        "ball": 0.3298
+      }
+    },
+    "test_public": {
+      "mAP50": 0.6384,
+      "mAP50_95": 0.4871,
+      "precision": 0.7301,
+      "recall": 0.6487,
+      "per_class_mAP50": {
+        "hand": 0.9939,
+        "ball": 0.283
+      }
+    }
+  },
+  "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "versions": {
+    "torch": "2.14.1+cu130",
+    "ultralytics": "8.4.215",
+    "python": "3.12.0"
+  },
+  "note": "test_public = HaGRID test split + COCO val2017 balls. Not own clips."
+}

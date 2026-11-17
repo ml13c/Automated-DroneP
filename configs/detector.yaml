@@ -22,4 +22,7 @@ train:
 export:
   imx:
     imgsz: 320
-    fraction: 0.05                    # share of train images used for INT8 calibration
+    # Ultralytics calibrates on the VAL split and recommends >300 images. 0.2 (~370 images)
+    # was OOM-killed at 15.5 GB in WSL's default ~16 GB cap (2026-11-16); 0.05 = 92 images
+    # fits. More images needs a larger WSL memory limit (.wslconfig).
+    fraction: 0.05

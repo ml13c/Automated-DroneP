@@ -58,6 +58,35 @@ python scripts/record_clips.py --distance 3 --place outdoor --count - --ball --e
    This fills `test_own` for the detector and the finger classifier. It is never used for
    training.
 
+## Train the detector (M2)
+
+```powershell
+python scripts/train_detector.py --name y11n_320_baseline   # settings: configs/detector.yaml
+```
+
+Weights land in `runs/detector/<name>/` (gitignored). The small outputs (metrics JSON, curves,
+confusion matrix) are copied to `results/detector/<name>/`.
+
+## IMX500 export (WSL2 Ubuntu)
+
+The Sony converter is Linux-only (Python 3.10–3.12, Java 17+). One-time setup:
+
+```bash
+sudo apt-get install -y openjdk-17-jre-headless python3-venv python3-dev libgl1
+python3 -m venv ~/venvs/dronevision && . ~/venvs/dronevision/bin/activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e "/mnt/c/<path to repo>[train,cpu,imx]"   # imx extra pins pulp<4 for MCT
+```
+
+Then, from the repo folder under `/mnt/c/...`:
+
+```bash
+python scripts/export_models.py --weights runs/detector/<run>/weights/best.pt --format imx
+```
+
+The first export installs Sony's toolchain (model-compression-toolkit, imx500-converter).
+File sizes and the converter's memory report go to `results/detector/<run>/imx_export.json`.
+
 ## Develop
 
 ```powershell
