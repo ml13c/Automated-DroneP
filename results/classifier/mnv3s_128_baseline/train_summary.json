@@ -1,0 +1,240 @@
+{
+  "run": "mnv3s_128_baseline",
+  "model": {
+    "arch": "mobilenet_v3_small",
+    "pretrained": true,
+    "input": 128
+  },
+  "train": {
+    "epochs": 30,
+    "batch": 128,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.1,
+    "workers": 6,
+    "seed": 0,
+    "aug": {
+      "scale": [
+        0.7,
+        1.0
+      ],
+      "rotate_deg": 15,
+      "hflip": 0.5,
+      "color_jitter": [
+        0.3,
+        0.3,
+        0.3,
+        0.05
+      ],
+      "grayscale": 0.1,
+      "blur": 0.2
+    }
+  },
+  "best_epoch": 26,
+  "wall_time_min": 6.8,
+  "peak_vram_reserved_gib": 0.46,
+  "params": 1525031,
+  "onnx_mb": 5.83,
+  "val_torch": {
+    "accuracy": 0.9881,
+    "per_class": {
+      "0": {
+        "precision": 0.9932,
+        "recall": 1.0,
+        "n": 290
+      },
+      "1": {
+        "precision": 0.9831,
+        "recall": 0.9864,
+        "n": 295
+      },
+      "2": {
+        "precision": 0.9792,
+        "recall": 0.9758,
+        "n": 289
+      },
+      "3": {
+        "precision": 0.9864,
+        "recall": 0.9764,
+        "n": 297
+      },
+      "4": {
+        "precision": 0.9835,
+        "recall": 0.9933,
+        "n": 300
+      },
+      "5": {
+        "precision": 0.9899,
+        "recall": 0.9966,
+        "n": 296
+      },
+      "none": {
+        "precision": 0.9976,
+        "recall": 0.9879,
+        "n": 413
+      }
+    }
+  },
+  "test_torch": {
+    "accuracy": 0.9864,
+    "per_class": {
+      "0": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "n": 292
+      },
+      "1": {
+        "precision": 0.9797,
+        "recall": 0.9898,
+        "n": 293
+      },
+      "2": {
+        "precision": 0.9731,
+        "recall": 0.9863,
+        "n": 293
+      },
+      "3": {
+        "precision": 0.9864,
+        "recall": 0.9699,
+        "n": 299
+      },
+      "4": {
+        "precision": 0.9671,
+        "recall": 0.9932,
+        "n": 296
+      },
+      "5": {
+        "precision": 1.0,
+        "recall": 0.9767,
+        "n": 300
+      },
+      "none": {
+        "precision": 0.9953,
+        "recall": 0.9882,
+        "n": 425
+      }
+    }
+  },
+  "test_onnx_cpu": {
+    "accuracy": 0.9868,
+    "per_class": {
+      "0": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "n": 292
+      },
+      "1": {
+        "precision": 0.9797,
+        "recall": 0.9898,
+        "n": 293
+      },
+      "2": {
+        "precision": 0.9731,
+        "recall": 0.9863,
+        "n": 293
+      },
+      "3": {
+        "precision": 0.9898,
+        "recall": 0.9699,
+        "n": 299
+      },
+      "4": {
+        "precision": 0.9672,
+        "recall": 0.9966,
+        "n": 296
+      },
+      "5": {
+        "precision": 1.0,
+        "recall": 0.9767,
+        "n": 300
+      },
+      "none": {
+        "precision": 0.9953,
+        "recall": 0.9882,
+        "n": 425
+      }
+    }
+  },
+  "onnx_cpu_median_ms_per_crop": 0.6,
+  "confusion_matrix_test_onnx": [
+    [
+      292,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      290,
+      3,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      3,
+      289,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      5,
+      290,
+      3,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      295,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      6,
+      293,
+      1
+    ],
+    [
+      0,
+      3,
+      0,
+      1,
+      1,
+      0,
+      420
+    ]
+  ],
+  "classes": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "none"
+  ],
+  "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "cpu": "AMD64 Family 25 Model 116 Stepping 1, AuthenticAMD",
+  "versions": {
+    "torch": "2.14.1+cu130",
+    "python": "3.12.0"
+  },
+  "note": "test = HaGRID test-split crops (public, subject-disjoint). Not own clips."
+}
