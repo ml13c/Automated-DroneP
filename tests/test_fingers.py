@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -39,10 +37,7 @@ def test_classifier_and_dataset_crop_settings_agree():
     ]
 
 
-ONNX = REPO_ROOT / load_config("classifier")["inference"]["onnx"]
-
-
-@pytest.mark.skipif(not Path(ONNX).is_file(), reason="trained classifier not present (CI)")
+@pytest.mark.weights(load_config("classifier")["inference"]["onnx"])
 def test_onnx_classifier_end_to_end():
     from dronevision.fingers import OnnxFingerClassifier
 

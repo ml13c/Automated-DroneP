@@ -1,4 +1,4 @@
-# Dataset build settings for scripts/build_dataset.py (M1).
+# Dataset build settings for scripts/build_dataset.py.
 # Sizes are per split; `--scale 0.05` on the CLI shrinks everything for a quick smoke run.
 
 root: data                      # all outputs (gitignored)

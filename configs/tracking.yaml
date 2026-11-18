@@ -1,4 +1,4 @@
-# M4: hand tracking, user marker and user lock (src/dronevision/{tracker,markers,user_lock}.py).
+# Hand tracking, user marker and user lock (src/dronevision/{tracker,markers,user_lock}.py).
 # Times are in seconds (frame-rate independent). Initial values: not tuned yet.
 
 hand_tracker:
@@ -35,7 +35,7 @@ user_lock:
   max_marker_dist: 1.0
 
 ball_tracker:
-  # Single-target tracker for THE ball in play (soccer use case, PLAN M4 "ball priors").
+  # Single-target tracker for THE ball in play (soccer: exactly one moving ball in play).
   # Sizes are in units of the ball's own diameter (scale-free across distances).
   low_conf: 0.15              # ball detections considered (gating removes most junk)
   # Acquisition: a candidate tracklet must be seen `acquire_hits` times AND have moved at least

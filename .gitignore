@@ -61,3 +61,15 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# ---- Local working notes, scratch and machine-specific outputs (stay on the dev machine) ----
+PLAN.md
+NOTES.md
+scratch/
+clips/
+scripts/preview_dataset.py
+results/dataset_preview_*.jpg
+results/**/val_batch*.jpg
+results/**/args.yaml
+results/**/*_export*.json
+results/**/*MemoryReport*.json

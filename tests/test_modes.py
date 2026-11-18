@@ -1,4 +1,4 @@
-"""Every mode transition (PLAN.md M5 done-when: unit tests cover every mode transition)."""
+"""Every mode transition, including the failsafes."""
 
 import copy
 

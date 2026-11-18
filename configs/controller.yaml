@@ -1,7 +1,7 @@
-# M5: target in the camera image -> velocity command (src/dronevision/controller.py).
+# Target in the camera image -> velocity command (src/dronevision/controller.py).
 #
 # Command frame (drone body): vx forward +, vy right +, vz UP +, yaw_rate clockwise (right) +.
-# The flight-controller bridge (M9) converts to MAVLink body-NED (z down) later.
+# A flight-controller bridge (MAVLink, planned) converts to MAVLink body-NED (z down) later.
 #
 # Image errors, all normalised to about -1..1, measured on the CAMERA image (un-mirrored):
 #   x     = target right of centre  (cx - w/2) / (w/2)

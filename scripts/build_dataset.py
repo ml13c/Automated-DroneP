@@ -1,4 +1,4 @@
-"""Build the M1 datasets.
+"""Build the detector and finger-classifier datasets.
 
     python scripts/build_dataset.py all              # hagrid + coco + own + summary
     python scripts/build_dataset.py hagrid --scale 0.05   # quick smoke run

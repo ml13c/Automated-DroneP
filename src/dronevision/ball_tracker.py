@@ -1,6 +1,6 @@
 """Tracker for THE ball in play (soccer use case): one target, lock on, stay on it.
 
-Owner priors (PLAN.md M4): exactly one ball is in play and it is moving; ball designs vary;
+Priors (soccer): exactly one ball is in play and it is moving; ball designs vary;
 per-frame recall can be well below 100 %. So instead of trusting every detection:
 
 SEARCHING  candidate tracklets are built from (low-confidence) ball detections. A tracklet is

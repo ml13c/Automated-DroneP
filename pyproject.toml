@@ -13,7 +13,7 @@ dependencies = [
     "opencv-python>=4.9",
     "PyYAML>=6.0",
     "psutil>=5.9",
-    "pupil-apriltags>=1.0.4",   # user marker (M4)
+    "pupil-apriltags>=1.0.4",   # user marker (AprilTag wristband)
 ]
 
 [project.optional-dependencies]
@@ -21,7 +21,7 @@ dependencies = [
 cpu = ["onnxruntime>=1.18"]
 gpu = ["onnxruntime-gpu>=1.20", "nvidia-ml-py>=12.0"]
 # PyTorch is NOT listed here on purpose: pip would pull the CPU-only wheel on Windows.
-# Install the CUDA build first (see README), then this extra.
+# Install the CUDA build first (see docs/SETUP.md), then this extra.
 train = ["ultralytics>=8.3", "onnx>=1.16"]
 dev = ["pytest>=8.0", "ruff>=0.6"]
 # IMX500 export (Linux/WSL only). Ultralytics installs the Sony toolchain itself at export
@@ -34,11 +34,16 @@ where = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-extend-exclude = ["legacy"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --strict-markers"
+markers = [
+    "weights(path): needs a trained model file; skipped when it is missing",
+    "data(path): needs a built dataset; skipped when it is missing",
+    "webcam: needs a camera; runs only with DRONEVISION_WEBCAM=1",
+    "gpu: needs the CUDA provider in ONNX Runtime",
+]

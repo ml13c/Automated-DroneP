@@ -1,6 +1,6 @@
 """Mode state machine: finger counts (vision) and glove commands -> flight mode.
 
-Rules (configs/modes.yaml, PLAN.md M5):
+Rules (configs/modes.yaml):
 - Vision: a count must be held `hold_s` with probability >= `min_prob`. Brief gaps (< max_gap_s)
   of missing/uncertain readings don't reset the hold; a different count does.
 - Glove: acts after `glove.hold_s` (0 = immediately). The emergency command "land" always acts

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -74,10 +72,7 @@ def test_config_has_threshold_for_every_class():
     assert set(cfg["inference"]["conf"]) >= set(load_config("dataset")["detector"]["classes"])
 
 
-ONNX = REPO_ROOT / load_config("detector")["inference"]["onnx"]
-
-
-@pytest.mark.skipif(not Path(ONNX).is_file(), reason="trained ONNX model not present (CI)")
+@pytest.mark.weights(load_config("detector")["inference"]["onnx"])
 def test_onnx_detector_runs_end_to_end():
     from dronevision.detector import OnnxDetector
 

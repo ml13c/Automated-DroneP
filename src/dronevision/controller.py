@@ -1,4 +1,4 @@
-"""Mode + target in the image -> velocity command (vx, vy, vz, yaw_rate). PLAN.md M5.
+"""Mode + target in the image -> velocity command (vx, vy, vz, yaw_rate).
 
 `Controller` is the pure part: one PID per axis on a normalised image error (box centre x/y,
 box size), then clamps and slew limits. Gains and limits are in configs/controller.yaml.

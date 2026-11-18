@@ -1,10 +1,10 @@
 """Live demo: open a camera or video file and show it with a HUD.
 
-M0: raw frames + measured FPS. M2: `--detector` adds the ONNX hand/ball detector
-(configs/detector.yaml) with its per-frame latency. M3: `--fingers` adds the finger count.
-M4: `--lock` adds hand tracking + the user lock (configs/tracking.yaml): show the wrist
+Without flags: raw frames + measured FPS. `--detector` adds the ONNX hand/ball detector
+(configs/detector.yaml) with its per-frame latency. `--fingers` adds the finger count.
+`--lock` adds hand tracking + the user lock (configs/tracking.yaml): show the wrist
 marker to acquire; the lock then follows your hand's track ID without the marker.
-`--ball` locks onto the moving ball. M5: `--control` is the full demo: user lock + finger
+`--ball` locks onto the moving ball. `--control` is the full demo: user lock + finger
 count -> flight mode (configs/modes.yaml), keyboard glove, failsafes, and the 20 Hz
 controller (configs/controller.yaml) drawn as a velocity command.
 
@@ -13,7 +13,7 @@ controller (configs/controller.yaml) drawn as a velocity command.
     python scripts/run_demo.py --source 0 --fingers          # count above each hand
     python scripts/run_demo.py --source 0 --lock --fingers   # count only the user's hand
     python scripts/run_demo.py --source clip.mp4 --ball      # lock onto the moving ball
-    python scripts/run_demo.py --source 0 --control          # full demo (M5)
+    python scripts/run_demo.py --source 0 --control          # full demo
 
 Keys: q/Esc quit, r release the user lock. With --control: 1-5 glove command,
 space glove emergency land, g glove link off/on, t reset after landing.
@@ -69,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--control",
         action="store_true",
-        help="full M5 demo: modes + glove + controller (implies --lock --fingers)",
+        help="full demo: modes + glove + controller (implies --lock --fingers)",
     )
     p.add_argument("--modes-config", default="modes")
     p.add_argument("--start-mode", help="override modes.yaml initial_mode (e.g. track_ball)")
@@ -296,7 +296,7 @@ def main(argv: list[str] | None = None) -> int:
                             ball_frames["tracking"] += 1
                             ball_frames["visible"] += ball_state.visible
 
-                    # ---- M5: modes + controller ------------------------------------------
+                    # ---- modes + controller ----------------------------------------------
                     if machine is not None:
                         prev_mode = mode_now
                         mstatus = machine.update(

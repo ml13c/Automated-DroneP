@@ -1,4 +1,4 @@
-# M5: finger count / glove command -> flight mode (src/dronevision/modes.py).
+# Finger count / glove command -> flight mode (src/dronevision/modes.py).
 
 initial_mode: hover
 
@@ -26,14 +26,13 @@ user_lost:                    # time since the locked user hand was last seen
   land_after_s: 10.0
   # Only in these modes. In track_ball the user being out of frame is normal (the drone is
   # watching the ball); with the real glove the failsafe should be on glove-link loss instead.
-  # Owner decision 2026-11-17: keep it to these modes.
   applies_in_modes: [follow_hand, hover]
 
-glove_link:                   # time since the last glove heartbeat; ALL modes (owner, 2026-11-17)
+glove_link:                   # time since the last glove heartbeat; ALL modes
   hover_after_s: 1.0          # forced hover; vision may still command land, nothing else
   land_after_s: 5.0
 
-ball_lost:                    # time the ball tracker has been searching (owner, 2026-11-17)
+ball_lost:                    # time the ball tracker has been searching
   hover_after_s: 3.0          # counted from entering the mode at the earliest
   applies_in_modes: [track_ball]
 

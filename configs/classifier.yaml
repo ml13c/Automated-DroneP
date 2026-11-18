@@ -1,4 +1,4 @@
-# Finger-count classifier (M3): scripts/train_classifier.py, src/dronevision/fingers.py.
+# Finger-count classifier: scripts/train_classifier.py, src/dronevision/fingers.py.
 
 data: data/fingers                    # ImageFolder: <split>/<class>/*.jpg (build_dataset.py)
 classes: ["0", "1", "2", "3", "4", "5", none]
@@ -30,4 +30,4 @@ inference:
   onnx: runs/classifier/mnv3s_128_baseline/best.onnx
   crop_pad: 0.25                      # must match fingers.crop_pad in configs/dataset.yaml
   providers: [CPUExecutionProvider]
-  min_prob: 0.50                      # below this the HUD shows "?" (mode logic in M5 has its own)
+  min_prob: 0.50                      # below this the HUD shows "?" (the mode logic has its own)

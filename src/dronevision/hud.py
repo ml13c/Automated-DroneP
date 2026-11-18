@@ -1,4 +1,4 @@
-"""On-screen overlay: stats panel, detections/tracks/markers/ball, and (M5) the mode panel
+"""On-screen overlay: stats panel, detections/tracks/markers/ball, the mode panel
 (mode, hold-progress bar, glove link) and the velocity-command widget."""
 
 from __future__ import annotations
@@ -121,7 +121,7 @@ def draw_ball(image: np.ndarray, state, roi=None) -> np.ndarray:
     return image
 
 
-# ---- M5: mode panel + velocity command --------------------------------------------------
+# ---- mode panel + velocity command ---- --------------------------------------------------
 _MODE_COLORS = {  # BGR
     "hover": (255, 200, 80),
     "follow_hand": (60, 230, 60),

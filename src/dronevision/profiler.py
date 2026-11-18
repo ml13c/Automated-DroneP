@@ -1,6 +1,6 @@
 """Timing and usage measurement.
 
-M0: a frame-rate meter. M6 adds per-stage timing and CPU/RAM/GPU sampling here.
+A frame-rate meter; per-stage timing and CPU/RAM/GPU sampling will live here too.
 """
 
 from __future__ import annotations
