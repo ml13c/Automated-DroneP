@@ -1,0 +1,33 @@
+# Finger-count classifier (M3): scripts/train_classifier.py, src/dronevision/fingers.py.
+
+data: data/fingers                    # ImageFolder: <split>/<class>/*.jpg (build_dataset.py)
+classes: ["0", "1", "2", "3", "4", "5", none]
+project: runs/classifier
+
+model:
+  arch: mobilenet_v3_small            # torchvision; small enough for the Pi 5 CPU
+  pretrained: true                    # ImageNet weights (torchvision download)
+  input: 128                          # square crop side fed to the network (PLAN: 96-128)
+
+train:
+  epochs: 30
+  batch: 128
+  lr: 0.001                           # AdamW, cosine decay
+  weight_decay: 0.0001
+  label_smoothing: 0.1
+  workers: 6
+  seed: 0
+  # Augmentation. Horizontal flip is safe: the count doesn't depend on left/right hand.
+  aug:
+    scale: [0.70, 1.0]                # RandomResizedCrop area range
+    rotate_deg: 15
+    hflip: 0.5
+    color_jitter: [0.3, 0.3, 0.3, 0.05]   # brightness, contrast, saturation, hue
+    grayscale: 0.1
+    blur: 0.2                         # probability of a small Gaussian blur
+
+inference:
+  onnx: runs/classifier/mnv3s_128_baseline/best.onnx
+  crop_pad: 0.25                      # must match fingers.crop_pad in configs/dataset.yaml
+  providers: [CPUExecutionProvider]
+  min_prob: 0.50                      # below this the HUD shows "?" (mode logic in M5 has its own)

@@ -38,3 +38,20 @@ def draw_stats(
             image, line, (x0 + pad, y), _FONT, scale, (255, 255, 255), thickness, cv2.LINE_AA
         )
     return image
+
+
+_CLASS_COLORS = {"hand": (80, 220, 80), "ball": (0, 160, 255)}  # BGR
+
+
+def draw_detections(image: np.ndarray, detections, thickness: int = 2) -> np.ndarray:
+    """Boxes + `name score` labels for dronevision.detector.Detection objects, in place."""
+    for d in detections:
+        color = _CLASS_COLORS.get(d.name, (255, 80, 80))
+        p1, p2 = (int(d.x1), int(d.y1)), (int(d.x2), int(d.y2))
+        cv2.rectangle(image, p1, p2, color, thickness)
+        label = f"{d.name} {d.score:.2f}"
+        (tw, th), _ = cv2.getTextSize(label, _FONT, 0.5, 1)
+        y = max(th + 4, p1[1])
+        cv2.rectangle(image, (p1[0], y - th - 4), (p1[0] + tw + 4, y), color, -1)
+        cv2.putText(image, label, (p1[0] + 2, y - 3), _FONT, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+    return image

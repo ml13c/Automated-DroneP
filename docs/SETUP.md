@@ -67,6 +67,20 @@ python scripts/train_detector.py --name y11n_320_baseline   # settings: configs/
 Weights land in `runs/detector/<name>/` (gitignored). The small outputs (metrics JSON, curves,
 confusion matrix) are copied to `results/detector/<name>/`.
 
+Export to ONNX and run the live detector (thresholds in `configs/detector.yaml`):
+
+```powershell
+python scripts/export_models.py --weights runs/detector/<run>/weights/best.pt --format onnx
+python scripts/run_demo.py --source 0 --detector
+```
+
+## Train the finger classifier (M3)
+
+```powershell
+python scripts/train_classifier.py --name mnv3s_128_baseline   # settings: configs/classifier.yaml
+python scripts/run_demo.py --source 0 --fingers                # count above each hand
+```
+
 ## IMX500 export (WSL2 Ubuntu)
 
 The Sony converter is Linux-only (Python 3.10–3.12, Java 17+). One-time setup:

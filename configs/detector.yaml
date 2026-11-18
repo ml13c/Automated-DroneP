@@ -19,6 +19,18 @@ train:
   # Augmentation: Ultralytics defaults for run 1 (mosaic, scale 0.5, hsv, fliplr).
   # Blur / small-object / brightness tuning comes AFTER the IMX500 export check (PLAN.md M2).
 
+inference:
+  # src/dronevision/detector.py (ONNX Runtime). CPU is the headline runtime (closest to the
+  # embedded path); CUDA is reported separately in M6.
+  onnx: runs/detector/y11n_320_baseline/weights/best.onnx
+  providers: [CPUExecutionProvider]
+  intra_op_threads: 0          # 0 = ONNX Runtime default
+  # Initial thresholds (not tuned yet). Ball gets its own: in mode 3 the Kalman gate filters
+  # false positives, so it can go lower there (PLAN.md M4).
+  conf: {hand: 0.40, ball: 0.25}
+  iou: 0.50
+  max_det: 20
+
 export:
   imx:
     imgsz: 320
