@@ -81,6 +81,16 @@ python scripts/train_classifier.py --name mnv3s_128_baseline   # settings: confi
 python scripts/run_demo.py --source 0 --fingers                # count above each hand
 ```
 
+## User lock (M4)
+
+1. Print `docs/markers/tag36h11_id0_6cm.pdf` at 100 % (check the 5 cm ruler), cut along the dashed
+   line, glue flat on cardboard and strap it to your wrist. Another size or ID:
+   `python scripts/make_marker.py --id 0 --size-cm 8` (the ID must be in `configs/tracking.yaml`).
+2. `python scripts/run_demo.py --source 0 --lock --fingers`
+3. Show the tag close to the camera with your hand up until the box turns green ("USER #id").
+   Step back: the lock follows your hand without the tag. Other hands are grey and ignored.
+   Press `r` to release the lock.
+
 ## IMX500 export (WSL2 Ubuntu)
 
 The Sony converter is Linux-only (Python 3.10–3.12, Java 17+). One-time setup:

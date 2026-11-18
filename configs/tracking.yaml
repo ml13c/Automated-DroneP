@@ -1,0 +1,67 @@
+# M4: hand tracking, user marker and user lock (src/dronevision/{tracker,markers,user_lock}.py).
+# Times are in seconds (frame-rate independent). Initial values: not tuned yet.
+
+hand_tracker:
+  # ByteTrack-style two-stage association. The detector is run with conf = low_thr for hands so
+  # weak (blurred) detections can still extend an existing track; only high ones start tracks.
+  high_thr: 0.40              # detections that may start a track / match in stage 1
+  low_thr: 0.10               # weaker detections only extend existing tracks (stage 2)
+  match_iou: 0.30             # min IoU (predicted track box vs detection) to match
+  min_hits: 3                 # updates before a new track is "confirmed" (shown / lockable)
+  max_coast_s: 1.0            # keep predicting a track this long without detections, then drop
+  coast_grace_s: 0.07         # no decay for the first ~2 frames (normal tracking unaffected)
+  coast_vel_halflife_s: 0.3   # while coasting, predicted velocity halves every this many s
+  coast_box_growth: 1.0       # matching box grows by this x box size per second of coasting
+  # Kalman noise, as fractions of box height (ByteTrack defaults)
+  std_pos: 0.05
+  std_vel: 0.00625
+
+marker:
+  type: apriltag              # apriltag | (planned) color_patch for the glove's wrist pod / LED
+  apriltag:
+    family: tag36h11
+    ids: [0]                  # only these IDs count as the user (ignore other tags around)
+    quad_decimate: 1.0        # >1 is faster but loses small/distant tags
+    min_decision_margin: 30   # reject weak decodes (pupil-apriltags decision_margin)
+    threads: 2
+
+user_lock:
+  # Acquire: the same confirmed hand track must be the nearest one to the marker for this many
+  # consecutive marker sightings. After that the marker is NOT needed: the lock follows the
+  # track ID through blur and dropouts until the tracker drops the track (max_coast_s).
+  acquire_frames: 5
+  # A hand is associated with the marker if the marker centre is within this many hand-box
+  # sizes of the hand box (0 = marker inside the box). Tag is on the wrist, so ~1 box.
+  max_marker_dist: 1.0
+
+ball_tracker:
+  # Single-target tracker for THE ball in play (soccer use case, PLAN M4 "ball priors").
+  # Sizes are in units of the ball's own diameter (scale-free across distances).
+  low_conf: 0.15              # ball detections considered (gating removes most junk)
+  # Acquisition: a candidate tracklet must be seen `acquire_hits` times AND have moved at least
+  # `acquire_motion` diameters (in play). Candidates that stay within `static_motion` diameters
+  # for `static_s` seconds are marked static (lamps, round signs) and ignored at that spot.
+  acquire_hits: 5
+  acquire_motion: 1.0
+  static_s: 1.0
+  static_motion: 0.3
+  candidate_gate: 2.0         # tracklet association radius (diameters)
+  candidate_max_age_s: 0.5    # forget unseen candidate tracklets after this
+  static_memory_s: 10.0       # how long a static spot stays ignored
+  # Locked tracking: gate = gate_diam x diameter, widened by gate_growth per second coasting.
+  gate_diam: 2.0             # (3.0 let random false positives in during misses: sweep 2026-11-17)
+  gate_min_px: 12             # tiny balls: never gate tighter than this
+  gate_growth: 4.0
+  max_coast_s: 1.5            # predict through misses this long, then search again
+  coast_vel_halflife_s: 0.5
+  smoothing: 0.6              # 0..1 weight of the measurement in position update (alpha)
+  vel_smoothing: 0.25         # beta; ~alpha^2/(2-alpha) = critically damped for alpha 0.6
+  trail_s: 1.0                # trail length drawn on the HUD
+
+ball_roi:
+  # Crop window for the next frame (IMX500 inference ROI later): square around the predicted
+  # ball position, big enough for motion + uncertainty, never smaller than min_px.
+  size_diam: 12.0             # side = this x ball diameter ...
+  min_px: 160
+  lead_s: 0.1                 # ... centred on the position predicted this far ahead
+  coast_growth: 1.5           # x(1 + growth * coast_s) while coasting

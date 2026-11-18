@@ -13,6 +13,7 @@ dependencies = [
     "opencv-python>=4.9",
     "PyYAML>=6.0",
     "psutil>=5.9",
+    "pupil-apriltags>=1.0.4",   # user marker (M4)
 ]
 
 [project.optional-dependencies]
