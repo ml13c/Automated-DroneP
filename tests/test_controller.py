@@ -37,8 +37,8 @@ def test_centred_target_at_setpoint_gives_zero():
 @pytest.mark.parametrize(
     ("target", "axis", "sign"),
     [
-        (tgt(cx=W * 0.9), "yaw_rate", +1),  # hand right of centre -> turn right
-        (tgt(cx=W * 0.1), "yaw_rate", -1),
+        (tgt(cx=W * 0.9), "vy", +1),  # hand right of centre -> move right until centred
+        (tgt(cx=W * 0.1), "vy", -1),
         (tgt(cy=H * 0.1), "vz", +1),  # hand high -> climb
         (tgt(size=SP * H * 0.5), "vx", +1),  # hand small (far) -> forward
         (tgt(size=SP * H * 1.6), "vx", -1),  # hand big (close) -> back off
@@ -62,18 +62,18 @@ def test_limits_and_slew():
     ctrl = Controller(cfg)
     far = tgt(cx=W, cy=0, size=1)  # max error everywhere
     first = ctrl.step("follow_hand", far, 0.0)
-    assert abs(first.yaw_rate) <= CFG["slew"]["yaw_rate"] * DT + 1e-9  # ramps, no jump
+    assert abs(first.vy) <= CFG["slew"]["vy"] * DT + 1e-9  # ramps, no jump
     cmd = settle(ctrl, "follow_hand", far)
     for a, lim in CFG["limits"].items():
         assert abs(cmd.as_dict()[a]) <= lim + 1e-9
     assert cmd.vz == pytest.approx(CFG["limits"]["vz"])
-    assert cmd.yaw_rate == pytest.approx(CFG["limits"]["yaw_rate"])
+    assert cmd.vy == pytest.approx(CFG["limits"]["vy"])
 
 
 def test_deadband():
-    db = CFG["modes"]["follow_hand"]["yaw_rate"]["deadband"]
+    db = CFG["modes"]["follow_hand"]["vy"]["deadband"]
     cmd = settle(Controller(CFG), "follow_hand", tgt(cx=W / 2 * (1 + db * 0.5)))
-    assert cmd.yaw_rate == 0
+    assert cmd.vy == 0
 
 
 def test_hover_and_lost_target_ramp_to_zero_land_descends():
@@ -83,7 +83,7 @@ def test_hover_and_lost_target_ramp_to_zero_land_descends():
         dict.fromkeys(("vx", "vy", "vz", "yaw_rate"), 0.0)
     )
     settle(ctrl, "follow_hand", tgt(cx=W))
-    assert settle(ctrl, "hover", tgt(cx=W)).yaw_rate == 0  # hover ignores the target
+    assert settle(ctrl, "hover", tgt(cx=W)).vy == 0  # hover ignores the target
     assert settle(ctrl, "land", None).vz == pytest.approx(CFG["land"]["vz"])
 
 
@@ -108,11 +108,11 @@ def test_control_loop_stale_target_holds():
     for _ in range(10):
         now[0] += DT
         cmd = loop.tick()
-    assert cmd.yaw_rate > 0
+    assert cmd.vy > 0
     for _ in range(40):  # no new target for 2 s -> stale -> ramps back to zero
         now[0] += DT
         cmd = loop.tick()
-    assert cmd.yaw_rate == 0
+    assert cmd.vy == 0
 
 
 def test_control_loop_runs_at_its_own_rate():

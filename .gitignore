@@ -73,3 +73,4 @@ results/**/val_batch*.jpg
 results/**/args.yaml
 results/**/*_export*.json
 results/**/*MemoryReport*.json
+docs/RECORDING.md

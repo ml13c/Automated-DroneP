@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-17",
+  "cpu": "AMD Ryzen 9 7940HS w/ Radeon 780M Graphics",
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "onnxruntime": "1.32.0",
+  "imgsz": 320,
+  "images": "200 val images, 30 warm-up + 300 timed frames per configuration, interleaved over 5 rounds",
+  "latency": [
+    {
+      "model": "FP32",
+      "provider": "CPU",
+      "size_mb": 10.05,
+      "infer_ms": {
+        "mean": 7.73,
+        "p50": 7.74,
+        "p95": 8.44
+      },
+      "total_ms": {
+        "mean": 9.23,
+        "p50": 9.26,
+        "p95": 10.1
+      }
+    },
+    {
+      "model": "FP32",
+      "provider": "CUDA",
+      "size_mb": 10.05,
+      "infer_ms": {
+        "mean": 6.27,
+        "p50": 6.16,
+        "p95": 7.27
+      },
+      "total_ms": {
+        "mean": 7.61,
+        "p50": 7.48,
+        "p95": 8.75
+      }
+    },
+    {
+      "model": "INT8 (ORT)",
+      "provider": "CPU",
+      "size_mb": 2.89,
+      "infer_ms": {
+        "mean": 9.39,
+        "p50": 9.49,
+        "p95": 10.16
+      },
+      "total_ms": {
+        "mean": 10.88,
+        "p50": 11.01,
+        "p95": 11.87
+      }
+    },
+    {
+      "model": "INT8 (ORT)",
+      "provider": "CUDA",
+      "size_mb": 2.89,
+      "infer_ms": {
+        "mean": 15.29,
+        "p50": 15.06,
+        "p95": 17.2
+      },
+      "total_ms": {
+        "mean": 16.71,
+        "p50": 16.43,
+        "p95": 18.76
+      }
+    }
+  ],
+  "accuracy_test_mAP50": {
+    "FP32": {
+      "mAP50": 0.6395,
+      "per_class_mAP50": {
+        "hand": 0.9926,
+        "ball": 0.2864
+      }
+    },
+    "INT8 (ORT)": {
+      "mAP50": 0.638,
+      "per_class_mAP50": {
+        "hand": 0.9915,
+        "ball": 0.2845
+      }
+    }
+  },
+  "imx500_reference": "results/detector/y11n_320_baseline/quantization.json"
+}

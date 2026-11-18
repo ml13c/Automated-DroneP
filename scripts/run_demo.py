@@ -14,9 +14,10 @@ controller (configs/controller.yaml) drawn as a velocity command.
     python scripts/run_demo.py --source 0 --lock --fingers   # count only the user's hand
     python scripts/run_demo.py --source clip.mp4 --ball      # lock onto the moving ball
     python scripts/run_demo.py --source 0 --control          # full demo
+    python scripts/run_demo.py --source 0 --sim              # + 2D drone sim side by side
 
-Keys: q/Esc quit, r release the user lock. With --control: 1-5 glove command,
-space glove emergency land, g glove link off/on, t reset after landing.
+Keys: q/Esc quit, r release the user lock. With --control: 1 glove unlock, 2-5 glove mode,
+space glove emergency land, g glove link off/on, t reset (hover, locked).
 """
 
 from __future__ import annotations
@@ -76,14 +77,21 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--controller-config", default="controller")
     p.add_argument("--save", type=Path, help="also write the annotated video here (.mp4)")
     p.add_argument("--no-window", action="store_true", help="don't open a window (files)")
+    p.add_argument(
+        "--sim",
+        action="store_true",
+        help="2D top-down drone sim next to the video (implies --control)",
+    )
+    p.add_argument("--sim-config", default="sim")
     args = p.parse_args(argv)
+    args.control = args.control or args.sim
     args.lock = args.lock or args.control
     args.fingers = args.fingers or args.control
     args.detector = args.detector or args.fingers or args.lock or args.ball
 
     cfg = load_config(args.config)
     detector = fingers = tracker = lock = marker_det = ball_tracker = None
-    machine = glove = loop = None
+    machine = glove = loop = sim = None
     if args.detector:
         from dronevision.detector import OnnxDetector
 
@@ -136,9 +144,16 @@ def main(argv: list[str] | None = None) -> int:
         machine = ModeMachine(mcfg)
         glove = KeyboardGlove.from_config(mcfg)
         loop = ControlLoop.from_config(ccfg)
+        if args.sim:
+            from dronevision.controller import image_errors
+            from dronevision.sim2d import Sim2D
+
+            scfg = load_config(args.sim_config)
+            sim = Sim2D(scfg)
+            follow_sp = ccfg["modes"]["follow_hand"]["vx"]["setpoint"]
         print(
             f"Control: start in {mcfg['initial_mode']}, controller {ccfg['rate_hz']} Hz. Keys: "
-            "1-5 glove, space emergency land, g glove link, t reset"
+            "1 unlock, 2-5 mode (glove), space emergency land, g glove link, t reset"
         )
 
     spec = args.source if args.source is not None else str(cfg.get("source", "0"))
@@ -164,7 +179,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.save:
         args.save.parent.mkdir(parents=True, exist_ok=True)
         out_fps = file_fps or float(cfg.get("fps") or 30)
-        writer = cv2.VideoWriter(str(args.save), cv2.VideoWriter_fourcc(*"mp4v"), out_fps, (w, h))
+        out_w = w + ((scfg["view"]["width_px"] or h) if sim is not None else 0)
+        writer = cv2.VideoWriter(
+            str(args.save), cv2.VideoWriter_fourcc(*"mp4v"), out_fps, (out_w, h)
+        )
+    sim_t, sim_err = None, None
 
     first_ts = last_ts = None
     n = 0
@@ -324,7 +343,16 @@ def main(argv: list[str] | None = None) -> int:
                         if target is not None:
                             cx = w - 1 - target[0] if mirror else target[0]  # camera's own view
                             target = Target(cx, target[1], target[2], w, h)
+                        if sim is not None:
+                            sim.hand = None
+                            if mstatus.mode == "follow_hand" and target is not None:
+                                # steer on what the SIM drone's camera would see (closed loop)
+                                target = sim.camera_target(target, follow_sp)
                         loop.post(mstatus.mode, target)
+                        if sim is not None:
+                            sim.step(loop.latest, 0.0 if sim_t is None else t - sim_t, mstatus.mode)
+                            sim_t = t
+                            sim_err = image_errors(target)["x"] if target is not None else None
 
                     if tracks is not None:
                         draw_tracks(image, [tr for tr in tracks if tr.confirmed], status, t)
@@ -351,12 +379,15 @@ def main(argv: list[str] | None = None) -> int:
                         draw_mode_panel(
                             image,
                             mstatus,
-                            machine.commands,
+                            {**machine.commands, machine.unlock_cmd: "unlock"},
                             glove.connected,
                             glove.link_lost_s(t),
                         )
                         draw_command(image, loop.latest, loop.controller.limits)
                 draw_stats(image, stats)
+                if sim is not None:
+                    panel = sim.render(h, machine.mode, sim_err, loop.latest)
+                    image = cv2.hconcat([image, panel])
                 if writer is not None:
                     writer.write(image)
 

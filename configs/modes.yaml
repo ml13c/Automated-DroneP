@@ -3,13 +3,21 @@
 initial_mode: hover
 
 # command -> mode. Commands are finger counts "0".."5" from vision, or the same from the glove.
-# Unlisted commands (and mode: null) do nothing. "4" = land always wins (see land_latched).
+# Unlisted commands do nothing.
 commands:
   "5": follow_hand
   "4": land
   "3": track_ball
   "2": hover
-  "1": null                   # TBD (ideas: orbit user, return to user, start/stop recording)
+
+# Mode lock: every mode locks when it is entered (by a command or a failsafe). While locked,
+# counts are ignored except the unlock command and the always-allowed modes. Unlock -> the next
+# command picks the mode and locks again. This is also how you leave `land`.
+lock:
+  unlock_command: "1"         # hold 1 finger (vision) or press glove 1
+  unlock_timeout_s: 5.0       # unlocked but no new command for this long -> locked again
+  start_locked: true
+  always_allowed: [land]      # safety: land works even while locked
 
 vision:
   hold_s: 0.7                 # the same count must be held this long ...
@@ -18,8 +26,6 @@ vision:
 
 glove:
   hold_s: 0.0                 # the glove is a deliberate press: act immediately
-
-land_latched: true            # once landing, ignore everything until reset (no re-takeoff by gesture)
 
 user_lost:                    # time since the locked user hand was last seen
   hover_after_s: 2.0

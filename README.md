@@ -16,10 +16,11 @@ to the person wearing the wristband marker.
 
 | Fingers (held 0.7 s) | Mode |
 |:---:|---|
-| 5 | **follow hand**: keep the user's hand centred at a set distance |
+| 1 | **unlock**: every mode locks once entered; 1 unlocks, the next count picks the mode |
+| 5 | **follow hand**: the drone flies its body to keep your hand centred at a set distance |
 | 3 | **track ball**: lock onto the one moving ball in play (soccer) |
 | 2 | **hover** |
-| 4 | **land**: always wins and stays latched |
+| 4 | **land**: works even while locked; unlock + a count to take off again |
 
 - **User lock.** An AprilTag on the wrist is only needed to *acquire* the user. After that the
   lock follows that hand's track ID through motion blur and missed detections, and every other
@@ -38,8 +39,10 @@ to the person wearing the wristband marker.
 
   All timings are in `configs/modes.yaml`.
 - **Control output.** A fixed 20 Hz control loop, separate from the camera loop, turns the
-  target's position and size in the image into a velocity command (vx, vy, vz, yaw rate) with
-  per-axis PID, clamps and slew limits. The HUD draws it as an arrow, a yaw arc and a
+  target's offset and size in the image into a velocity command (vx, vy, vz, yaw rate) with
+  per-axis PID, clamps and slew limits. In follow-hand the drone moves its body (not a gimbal)
+  until the hand is centred again, so the user steers it by moving their hand. The sim closes
+  that loop: it re-projects the hand into the simulated drone's own camera as it flies. The HUD draws it as an arrow, a yaw arc and a
   climb bar.
 
 ## How it works
@@ -100,6 +103,11 @@ ONNX Runtime on CPU, 640×480 webcam:
 | Whole loop | 30.0 FPS (camera-limited) |
 | Control loop | 20.1 Hz, 0 late ticks |
 
+**Detector runtime**: CPU vs CUDA and FP32 vs ONNX Runtime INT8, latency and test mAP50 on the
+same laptop: [results/benchmarks.md](results/benchmarks.md).
+
+![Detector latency: CPU vs CUDA, FP32 vs INT8](results/benchmarks.png)
+
 More: [dataset summary](results/dataset_summary.md),
 [detector curves](results/detector/y11n_320_baseline/),
 [classifier confusion matrix](results/classifier/mnv3s_128_baseline/confusion_matrix_test.png).
@@ -141,10 +149,12 @@ steps are in [docs/SETUP.md](docs/SETUP.md).
 - [x] Mode state machine, failsafes, 20 Hz controller, HUD
 - [ ] Ball accuracy: elevated/aerial soccer data, camera-motion compensation, detector inside
   the ROI crop
-- [ ] Benchmarks: per-stage latency, CPU vs GPU, FP32 vs INT8, accuracy vs distance
+- [x] Detector benchmarks: CPU vs CUDA, FP32 vs INT8 (latency + accuracy)
+- [ ] More benchmarks: per-stage latency and resource use, accuracy vs distance
 - [ ] Power: measured energy per frame and a modelled flight-time budget
 - [ ] Demo GIFs
-- [ ] Simulation: 2D top-down sim, then ArduPilot SITL over MAVLink
+- [x] 2D top-down sim driven by the controller (`run_demo.py --sim`)
+- [ ] ArduPilot SITL over MAVLink
 - [ ] Hardware: Pi 5 + IMX500 port, glove prototype
 
 ## Credits and licenses

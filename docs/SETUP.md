@@ -25,6 +25,7 @@ The demo needs the two ONNX models at the paths in `configs/detector.yaml` and
 
 ```powershell
 python scripts/run_demo.py --source 0 --control              # full demo on webcam 0
+python scripts/run_demo.py --source 0 --sim                  # + 2D drone sim (pip install -e ".[sim]")
 python scripts/run_demo.py --source clip.mp4 --ball          # ball tracking on a video
 python scripts/run_demo.py --source clip.mp4 --control --start-mode track_ball --save out.mp4
 ```
@@ -34,14 +35,20 @@ python scripts/run_demo.py --source clip.mp4 --control --start-mode track_ball -
    strap it to your wrist.
 2. Show the tag to the camera until your hand box turns green (`USER #id`). Step back: the lock
    follows your hand without the tag. Other hands are grey and ignored.
-3. Hold a finger count for 0.7 s: `5` follow hand, `3` track ball, `2` hover, `4` land.
+3. Every mode is locked once entered. Hold `1` for 0.7 s to unlock, then hold the next count
+   for 0.7 s: `5` follow hand, `3` track ball, `2` hover, `4` land. Land also works while
+   locked; after landing, unlock and pick a mode to take off again. Unlocked with no new
+   count for 5 s locks again. In follow hand, the drone moves towards wherever your hand is
+   until the hand is centred in its camera. With `--sim`, the sim drone's own camera view is
+   used, so it stops once it's in front of your hand (the webcam itself never moves).
 
 | Key | Action |
 |---|---|
-| `1`–`5` | simulated glove command (acts immediately) |
+| `1` | simulated glove: unlock (acts immediately) |
+| `2`–`5` | simulated glove: pick a mode after unlocking (acts immediately) |
 | space | glove emergency land |
 | `g` | glove link off/on (simulated radio loss) |
-| `t` | reset after landing (land is latched) |
+| `t` | reset to the start mode (hover, locked) |
 | `r` | release the user lock |
 | `q` / Esc | quit |
 

@@ -129,6 +129,7 @@ _MODE_COLORS = {  # BGR
     "land": (60, 60, 255),
 }
 _OK = (60, 230, 60)
+_UNLOCKED = (0, 220, 255)  # BGR yellow
 _BAD = (60, 60, 255)
 
 
@@ -150,14 +151,26 @@ def draw_mode_panel(
     commands: Mapping[str, str | None],
     glove_connected: bool | None = None,
     glove_lost_s: float = 0.0,
-    width: int = 250,
+    width: int = 275,
 ) -> np.ndarray:
-    """Top-right panel: current mode (+ why), the vision hold-progress bar, glove link."""
+    """Top-right panel: current mode (+ why), lock state, the vision hold-progress bar, glove
+    link. `commands` maps a count to what it does (a mode name or "unlock")."""
     w = image.shape[1]
     x0, y0 = w - width - 10, 10
     _panel(image, x0, y0, x0 + width, y0 + (116 if glove_connected is not None else 94))
     color = _MODE_COLORS.get(status.mode, (255, 255, 255))
     _text(image, status.mode.replace("_", " ").upper(), (x0 + 8, y0 + 24), 0.7, color, 2)
+    locked = getattr(status, "locked", True)
+    lock_text = "LOCKED" if locked else f"UNLOCKED {getattr(status, 'unlock_left_s', 0.0):.1f}s"
+    (lw, _), _ = cv2.getTextSize(lock_text, _FONT, 0.45, 1)
+    _text(
+        image,
+        lock_text,
+        (x0 + width - lw - 8, y0 + 22),
+        0.45,
+        (170, 170, 170) if locked else _UNLOCKED,
+        1,
+    )
     _text(image, status.reason[:34], (x0 + 8, y0 + 44), 0.42, (210, 210, 210))
 
     # hold bar: which count is being held and how far along
@@ -166,10 +179,14 @@ def draw_mode_panel(
     if status.pending is not None:
         target = commands.get(status.pending) or "?"
         fill = int(bx0 + (bx1 - bx0) * max(0.0, min(status.hold_progress, 1.0)))
-        cv2.rectangle(image, (bx0, by0), (fill, by1), _MODE_COLORS.get(target, color), -1)
+        bar = _UNLOCKED if target == "unlock" else _MODE_COLORS.get(target, color)
+        cv2.rectangle(image, (bx0, by0), (fill, by1), bar, -1)
         label = f"hold {status.pending} -> {target.replace('_', ' ')}"
+    elif locked:
+        unlock = next((k for k, v in commands.items() if v == "unlock"), "1")
+        label = f"locked: hold {unlock} to unlock"
     else:
-        label = "hold a count to switch mode"
+        label = "unlocked: hold a count to pick a mode"
     _text(image, label, (bx0, by1 + 16), 0.42, (230, 230, 230))
 
     if glove_connected is not None:

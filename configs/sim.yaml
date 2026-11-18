@@ -1,0 +1,17 @@
+# 2D top-down drone sim (src/dronevision/sim2d.py), driven by the controller's velocity command.
+# Kinematic toy model for the demo, not a flight-dynamics model: each axis follows the command
+# with a first-order lag. Values are illustrative, not measured.
+
+start_altitude_m: 3.0         # the drone starts hovering here (and re-takes off here after land)
+max_altitude_m: 10.0
+takeoff_speed_mps: 0.5       # climb rate when taking off again after a landing
+response_tau_s: 0.4           # first-order lag from command to actual velocity, per axis
+camera_hfov_deg: 66.0         # IMX500 camera module horizontal field of view (datasheet)
+user_distance_m: 3.0          # user stands this far in front of the drone's start point
+min_view_distance_m: 0.5     # closer than this counts as this (no division blow-up)
+
+view:
+  width_px: 0                 # sim panel width; 0 = same as the video height (square panel)
+  metres_across: 16.0         # world width shown in the panel (drone stays centred)
+  grid_m: 1.0
+  trail_s: 20.0               # how much of the flown path to draw
