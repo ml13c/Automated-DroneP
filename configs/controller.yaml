@@ -1,0 +1,40 @@
+# M5: target in the camera image -> velocity command (src/dronevision/controller.py).
+#
+# Command frame (drone body): vx forward +, vy right +, vz UP +, yaw_rate clockwise (right) +.
+# The flight-controller bridge (M9) converts to MAVLink body-NED (z down) later.
+#
+# Image errors, all normalised to about -1..1, measured on the CAMERA image (un-mirrored):
+#   x     = target right of centre  (cx - w/2) / (w/2)
+#   y     = target above centre     (h/2 - cy) / (h/2)
+#   size  = target too small (far)  (setpoint - s) / setpoint, s = box height / frame height
+#
+# Gains are untuned starting values for the laptop demo (no drone yet): not measured numbers.
+
+rate_hz: 20                   # fixed control loop, independent of the camera FPS
+target_timeout_s: 0.3         # no fresh target for this long -> hold position (zero command)
+
+limits:                       # output clamps
+  vx: 1.0                     # m/s
+  vy: 1.0                     # m/s
+  vz: 0.5                     # m/s
+  yaw_rate: 45.0              # deg/s
+slew:                         # max change per second (smooth starts/stops)
+  vx: 2.0                     # m/s^2
+  vy: 2.0
+  vz: 1.0
+  yaw_rate: 120.0             # deg/s^2
+
+land:
+  vz: -0.4                    # m/s descent while landing (the FC's own land mode in reality)
+
+# Per mode: axis -> PID on one image error. Axes not listed stay 0.
+# deadband: |error| below this counts as 0 (no hunting around the centre).
+# i_limit: clamp on the integral term's contribution (same units as the output).
+modes:
+  follow_hand:                # drone faces the user and keeps the hand centred at a set size
+    yaw_rate: {error: x, kp: 40.0, ki: 0.0, kd: 4.0, deadband: 0.05, i_limit: 10.0}
+    vz:       {error: y, kp: 0.5, ki: 0.0, kd: 0.05, deadband: 0.05, i_limit: 0.2}
+    vx:       {error: size, setpoint: 0.25, kp: 0.8, ki: 0.0, kd: 0.1, deadband: 0.1, i_limit: 0.3}
+  track_ball:                 # camera tilted down; ball above centre = farther ahead
+    yaw_rate: {error: x, kp: 35.0, ki: 0.0, kd: 3.0, deadband: 0.05, i_limit: 10.0}
+    vx:       {error: y, kp: 0.8, ki: 0.05, kd: 0.1, deadband: 0.05, i_limit: 0.3}

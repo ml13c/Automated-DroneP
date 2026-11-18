@@ -26,8 +26,17 @@ user_lost:                    # time since the locked user hand was last seen
   land_after_s: 10.0
   # Only in these modes. In track_ball the user being out of frame is normal (the drone is
   # watching the ball); with the real glove the failsafe should be on glove-link loss instead.
-  # OPEN DECISION for the owner (2026-11-17).
+  # Owner decision 2026-11-17: keep it to these modes.
   applies_in_modes: [follow_hand, hover]
+
+glove_link:                   # time since the last glove heartbeat; ALL modes (owner, 2026-11-17)
+  hover_after_s: 1.0          # forced hover; vision may still command land, nothing else
+  land_after_s: 5.0
+
+ball_lost:                    # time the ball tracker has been searching (owner, 2026-11-17)
+  hover_after_s: 3.0          # counted from entering the mode at the earliest
+  applies_in_modes: [track_ball]
 
 keyboard_glove:               # src/dronevision/glove_sim.py (stand-in for the real glove)
   keys: {"1": "1", "2": "2", "3": "3", "4": "4", "5": "5", " ": land}
+  link_toggle_key: g          # simulates the radio link dropping / coming back (heartbeat stops)

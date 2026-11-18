@@ -1,7 +1,7 @@
 """Print-ready AprilTag (tag36h11) for the user's wrist marker.
 
-    python scripts/make_marker.py                    # ID 0, 6 cm -> docs/markers/*.pdf
-    python scripts/make_marker.py --id 0 --size-cm 8
+    python scripts/make_marker.py                    # ID 0, 12 cm (default wrist tag)
+    python scripts/make_marker.py --size-cm 6        # close-range tests
 
 Print at 100 % / "actual size" (no fit-to-page), check the 5 cm ruler, cut along the dashed
 line (keeps the white border the detector needs), glue flat on cardboard, strap to the wrist.
@@ -24,7 +24,7 @@ PAGE_IN = (8.5, 11.0)  # US Letter; fits A4 too (content is centred and small)
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("--id", type=int, default=0)
-    p.add_argument("--size-cm", type=float, default=6.0, help="black square edge length")
+    p.add_argument("--size-cm", type=float, default=12.0, help="black square edge length")
     p.add_argument("--out", type=Path, default=REPO_ROOT / "docs" / "markers")
     p.add_argument("--png", action="store_true", help="also write a 300-dpi PNG of the page")
     args = p.parse_args(argv)

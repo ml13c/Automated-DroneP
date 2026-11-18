@@ -83,13 +83,61 @@ python scripts/run_demo.py --source 0 --fingers                # count above eac
 
 ## User lock (M4)
 
-1. Print `docs/markers/tag36h11_id0_6cm.pdf` at 100 % (check the 5 cm ruler), cut along the dashed
-   line, glue flat on cardboard and strap it to your wrist. Another size or ID:
-   `python scripts/make_marker.py --id 0 --size-cm 8` (the ID must be in `configs/tracking.yaml`).
+1. Print a tag at 100 % / "actual size" (check the 5 cm ruler), cut along the dashed line, glue
+   it flat on cardboard and strap it to your wrist:
+   - `docs/markers/tag36h11_id0_12cm.pdf`: the default, readable from further away.
+   - `docs/markers/tag36h11_id0_6cm.pdf`: for close-range tests at the desk.
+
+   For another size or ID: `python scripts/make_marker.py --id 0 --size-cm 8` (the ID must be
+   in `configs/tracking.yaml`).
 2. `python scripts/run_demo.py --source 0 --lock --fingers`
 3. Show the tag close to the camera with your hand up until the box turns green ("USER #id").
    Step back: the lock follows your hand without the tag. Other hands are grey and ignored.
    Press `r` to release the lock.
+
+## Full demo: modes + control (M5)
+
+```powershell
+python scripts/run_demo.py --source 0 --control
+```
+
+Lock on with the tag (as above), then hold up a finger count for 0.7 s to switch mode:
+`5` follow hand, `3` track ball, `2` hover, `4` land. The top-right panel shows the mode, why
+it changed, the hold-progress bar and the glove link. The bottom-right widget is the 20 Hz
+velocity command (arrow = forward/right, arc = yaw, bar = up/down).
+
+| Key | Action |
+|---|---|
+| `1`–`5` | glove command (acts immediately) |
+| space | glove emergency land |
+| `g` | glove link off/on (simulated heartbeat loss) |
+| `t` | reset after landing (land is latched) |
+| `r` | release the user lock |
+| `q` / Esc | quit |
+
+Failsafes ([configs/modes.yaml](../configs/modes.yaml)):
+
+- User lost 2 s → hover, 10 s → land (follow hand / hover only).
+- Glove link lost 1 s → hover, 5 s → land (all modes).
+- Ball lost 3 s in track ball → hover.
+
+Gains and limits are in [configs/controller.yaml](../configs/controller.yaml).
+
+The command is in the drone's frame. The webcam image is mirrored for display, so when your
+hand moves to *your* right, the drone (which faces you) yaws to *its* left.
+
+### Ball tracking on a video clip
+
+```powershell
+python scripts/run_demo.py --source data/clips/<clip>.mp4 --ball --save recordings/ball.mp4
+python scripts/run_demo.py --source data/clips/<clip>.mp4 --control --start-mode track_ball
+```
+
+Add `--no-window` to process a clip without showing it.
+
+The test clips used so far are free Mixkit stock videos (mixkit.co, Mixkit License),
+downloaded into the gitignored `data/clips/`. For example:
+`https://assets.mixkit.co/videos/43482/43482-720.mp4`.
 
 ## IMX500 export (WSL2 Ubuntu)
 
